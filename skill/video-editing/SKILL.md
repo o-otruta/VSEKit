@@ -21,7 +21,7 @@ from this skill's real path → else `~/Documents/VSEKit`. Below, every path is 
 
 Run `.venv\Scripts\python.exe tools\doctor.py` (any Python works if `.venv` doesn't exist yet). It prints
 OK/MISSING/WARN per component and exits 1 when something required is missing.
-- **VSEKit folder missing** → it isn't on this machine: ask the user for the repo (git clone) — don't
+- **VSEKit folder missing** → it isn't on this machine: clone https://github.com/o-otruta/VSEKit (ask the user first) and run setup.ps1 — don't
   rebuild the toolkit from memory.
 - **Required component missing** → offer to run `powershell -ExecutionPolicy Bypass -File setup.ps1`
   (installs winget tools, both venvs, Real-ESRGAN, Blender modules, the skill link; idempotent). It

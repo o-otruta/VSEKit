@@ -8,7 +8,7 @@ use (and extend) all of it.
 ## Install on a new machine (Windows)
 
 ```powershell
-git clone <this repo> $HOME\Documents\VSEKit      # any folder works
+git clone https://github.com/o-otruta/VSEKit.git $HOME\Documents\VSEKit   # any folder works
 cd $HOME\Documents\VSEKit
 powershell -ExecutionPolicy Bypass -File setup.ps1          # full (several GB: torch, models download later)
 # or: setup.ps1 -SkipML                                      # light: no torch/whisper/kokoro/DeepFilterNet
