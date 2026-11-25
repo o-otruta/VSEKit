@@ -5,6 +5,10 @@ tools/realesrgan/
 __pycache__/
 *.pyc
 
+# user video projects are LOCAL ONLY (the repo is public); projectb_devlog stays as the template
+projects/*
+!projects/projectb_devlog/
+
 # media and generated output (recreate with demos/fetch_media.py and the build scripts)
 media/
 demos/out/

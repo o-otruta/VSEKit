@@ -33,7 +33,7 @@ Overrides if auto-detection picks the wrong thing: `VSEKIT_BLENDER`, `VSEKIT_FFM
 |---|---|
 | `vsekit/` | the library (see below) |
 | `skill/video-editing/` | Claude Code skill: workflow, tool verdicts, API pitfalls, platform specs |
-| `projects/<name>/` | one folder per real video: `config.py` → `prepare.py` → `build.py` → `make.sh` |
+| `projects/<name>/` | one folder per real video: `config.py` → `prepare.py` → `build.py` → `make.sh`. **Local only** (gitignored); `projects/projectb_devlog` is the tracked template to copy |
 | `demos/` | one script per tool test; outputs in `demos/out/` (gitignored) |
 | `tools/` | `doctor.py`, Unity editor scripts (`tools/unity/`), downloaded binaries (gitignored) |
 | `assets/fonts/` | Russo One + Rubik (SIL OFL, licences included) |

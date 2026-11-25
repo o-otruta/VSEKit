@@ -71,8 +71,12 @@ Set `HF_HUB_DISABLE_SYMLINKS_WARNING=1` to silence Hugging Face noise.
    (`transcribe.chapters`), thumbnail, `.otio` (`wm.otio_export`, see API notes) for DaVinci Resolve.
    Say what you verified (frames, levels) and what you did not (you cannot listen to audio).
 
-Where outputs go: user projects → their own folder (ask if unclear); experiments → `<VSEKIT>/media`
-or `demos/` (media there is gitignored). Don't drop renders into unrelated code repos.
+Where things go: each real video gets `projects/<name>/` (copy the `projects/projectb_devlog` template).
+**The VSEKit repo is public and `projects/*` is gitignored** — user projects stay local on purpose (scripts,
+voice-over text and paths are private). Never force-add them (`git add -f`) or move them out of `projects/`
+to get them committed; if the user wants a backup, suggest a separate private repo. Only the template
+`projects/projectb_devlog` is tracked. Experiments → `<VSEKIT>/media` or `demos/` (media gitignored).
+Don't drop renders into unrelated code repos.
 
 **Rebuilding overwrites manual edits.** Iterate with scripts while structure changes; once the user starts
 polishing in Blender, edit the open file through MCP instead (check `bpy.data.is_dirty` first — never
@@ -130,7 +134,7 @@ deprecated (removal in 6.0); summed VO+music+SFX clips — set `scene.audio_volu
 VSEKit is the user's long-lived toolbox and a git repo; anything reusable you write belongs there, so the
 next video (and the next machine) starts further ahead.
 - **Where code goes**: reusable helper → a function in the matching `vsekit/<module>.py` (or a new module
-  + a line in `vsekit/__init__.py`); a concrete video → `projects/<name>/` (config/prepare/build);
+  + a line in `vsekit/__init__.py`); a concrete video → `projects/<name>/` (local only, gitignored — see "Where things go");
   a tool test or showcase → `demos/`; Unity/Blender editor scripts → `tools/`. Not the scratchpad, not the
   user's game repo.
 - **Adding a tool** means all of: install step in `setup.ps1` (idempotent, skip if present), pinned version in
