@@ -1,0 +1,5 @@
+# DeepFilterNet venv (.venv-df, Python 3.11). Kept separate: it pins numpy<2 and torchaudio<2.1,
+# which would break librosa/opencv in the main venv. torch==2.0.1/torchaudio==2.0.2 CPU come from
+# https://download.pytorch.org/whl/cpu (setup.ps1 handles it).
+deepfilternet==0.5.6
+soundfile==0.14.0

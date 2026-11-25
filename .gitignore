@@ -1,0 +1,22 @@
+# environments & downloaded tools (recreated by setup.ps1)
+.venv/
+.venv-df/
+tools/realesrgan/
+__pycache__/
+*.pyc
+
+# media and generated output (recreate with demos/fetch_media.py and the build scripts)
+media/
+demos/out/
+demos/work/
+projects/*/out/
+projects/*/assets/
+projects/*/*.blend
+*.blend1
+*.whisper.json
+*.beats.json
+*.scenes_*.json
+
+# local machine overrides
+.env
+*.local.*
