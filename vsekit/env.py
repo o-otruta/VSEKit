@@ -42,7 +42,8 @@ def _steam_libraries():
         vdf = os.path.join(steam, "steamapps", "libraryfolders.vdf")
         if os.path.exists(vdf):
             roots.append(steam)
-            txt = open(vdf, encoding="utf-8", errors="ignore").read()
+            with open(vdf, encoding="utf-8", errors="ignore") as f:
+                txt = f.read()
             roots += [p.replace("\\\\", "\\") for p in re.findall(r'"path"\s+"([^"]+)"', txt)]
     return list(dict.fromkeys(roots))
 

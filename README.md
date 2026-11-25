@@ -43,7 +43,7 @@ Overrides if auto-detection picks the wrong thing: `VSEKIT_BLENDER`, `VSEKIT_FFM
 
 Outside Blender (`.venv`): `env` (tool discovery), `audio` (music/SFX synth), `gfx` (Pillow graphics),
 `tts` (edge / kokoro / sapi + whisper align), `media` (ffmpeg: probe, loudness, finalize −14 LUFS, contact
-sheets, image-sequence assembly), `transcribe` (whisper, SRT, jump-cut lists, chapters), `beats` (tempo,
+sheets, cut-boundary strips, export verification, image-sequence assembly), `transcribe` (whisper, SRT, jump-cut lists, chapters), `beats` (tempo,
 beats, downbeats, energy), `scenes` (shot detection), `denoise` (DeepFilterNet, ffmpeg voice chain,
 silencedetect), `upscale` (Real-ESRGAN), `download` (yt-dlp), `analyze` (`python -m vsekit.analyze
 <url|file>` → report.md).

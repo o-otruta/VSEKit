@@ -59,17 +59,26 @@ Set `HF_HUB_DISABLE_SYMLINKS_WARNING=1` to silence Hugging Face noise.
    highlight, pills, cards, phone mockup, lower thirds, gradients, glow), TTS (`tts`), cleaned voice
    (`denoise`), upscaled stills (`upscale`), music/SFX (`audio` synth or licensed tracks). Fonts:
    `env.FONT_TITLE` / `env.FONT_BODY` (OFL, in `assets/fonts`). Write a `manifest.json` the build reads.
+   **Direct before building** (anything where motion, pacing or graphics carry the video — hooks, intros,
+   trailers, title cards, explainers, UI demos): one thread, 3–5 different options for the scenes that
+   matter, a shot card per scene, an accent map from the real track, a probe of the riskiest shot.
+   Read `references/direction_and_quality.md` — it also defines what "good" means by default (weight and
+   easing, parallax over flat zooms, acting typography, no flash-on-every-beat).
 5. **Build the timeline** (`build.py`, inside Blender) with `vsekit.vse`: one storyboard `config.py`,
    named channels, every effect as a strip/keyframe/node group so it stays editable. Template:
    `projects/projectb_devlog/` (config → prepare → build → make.sh); smaller examples in `demos/d*.py`.
 6. **Preview before rendering**: `blender -b file.blend --python vsekit/preview.py -- <out> 25 6 <frames…>`
    and Read the sheet. Fix layout issues now — a full render costs minutes, a preview seconds.
 7. **Render** (`blender -b file.blend -a`, run in background), then **finalize**: `media.finalize()`
-   (loudnorm to −14 LUFS, video stream copied), `media.probe()` + `media.loudness()` to verify, and a
-   contact sheet of the final file to confirm nothing broke.
+   (loudnorm to −14 LUFS, video stream copied). **The first full render is a draft**: verify the decoded
+   file (`media.verify_export()` — codec, size, fps, real frame count, audio present and not silent —
+   plus `media.loudness()`), review it (contact sheet + `media.boundary_strip()` at every cut and sync
+   point), log issues as interval → observation → cause → fix, fix causes, re-render, re-check.
 8. **Hand over**: final mp4, the `.blend`, plus whatever fits — `.srt` (`transcribe.to_srt`), chapters
    (`transcribe.chapters`), thumbnail, `.otio` (`wm.otio_export`, see API notes) for DaVinci Resolve.
-   Say what you verified (frames, levels) and what you did not (you cannot listen to audio).
+   Report status per property with the honest-status words from `references/direction_and_quality.md`
+   (rendered / seen in frames / checked across boundaries — but *watched in motion* and *listened* are the
+   user's job; name the exact moments they should check).
 
 Where things go: each real video gets `projects/<name>/` (copy the `projects/projectb_devlog` template).
 **The VSEKit repo is public and `projects/*` is gitignored** — user projects stay local on purpose (scripts,
@@ -88,10 +97,11 @@ reload a file with unsaved user changes; ask).
   range on alternating A/B channels → punch-in (scale 1.1–1.15) on every other cut to hide jumps →
   karaoke captions → SRT + chapters. Example: `demos/d2_jumpcuts.py`.
 - **Shorts/TikTok hook edit**: 9:16, hook text in first 2 s, captions in the safe zone (y≈1250 of 1920),
-  punch-ins/flashes on strong beats (`beats.strongest`), speed ramp via retiming, progress bar, −14 LUFS.
+  punch-ins on a few strong beats (`beats.strongest`; flashes sparingly, not on every hit), speed ramp via retiming, progress bar, −14 LUFS.
   Examples: `demos/d1_gameplay_short.py`, `projects/projectb_devlog`.
 - **Trailer / music montage**: `scenes.detect` → pick usable shots → cut on beats (every 2 beats, then every
-  beat for the climax) inside `beats.loudest_section()` → flashes on downbeats → title/end cards with
+  beat for the climax) inside `beats.loudest_section()` → varied accents on chosen downbeats (whip, punch-in,
+  hard cut, the odd flash) → title/end cards with
   attribution. Example: `demos/d6_auto_trailer.py`.
 - **Reference breakdown** ("how is this video edited?"): `python -m vsekit.analyze <url|file>` → report.md
   with cuts/min, shot lengths, wpm, talk ratio, loudness, hook, chapters, contact sheet. Use it to set pace
@@ -158,6 +168,9 @@ next video (and the next machine) starts further ahead.
 
 ## Reference files
 
+- `references/direction_and_quality.md` — quality defaults, storyboard/shot cards, accent map, the
+  review loop, honest status words, reference analysis, UI-demo motion. Read before planning any
+  motion-heavy piece.
 - `references/blender_vse_api.md` — VSE/compositor API notes, snippets, gotchas.
 - `references/platforms.md` — YouTube / Shorts / TikTok specs, safe zones, loudness, thumbnails, chapters.
 - `references/unity_capture.md` — recording gameplay from a Unity project (Recorder + bot + traps).
