@@ -111,6 +111,13 @@ reload a file with unsaved user changes; ask).
 - **Bad audio**: `denoise.deepfilter()` (+ `voice_chain` without afftdn for EQ/compression). The ffmpeg-only
   chain is fine for light hiss, useless for heavy noise.
 - **Low-res stills/UI**: `upscale(kind="anime"|"video2")` for UI/flat art; `"photo"` invents fake letters on text.
+- **Motion graphics that are cheap in a browser** (per-letter kinetic type, SVG line drawing, UI/app
+  mockups with cursor and states, d3 charts, Lottie): write an HTML page (CSS animations / Web Animations
+  are seeked automatically; anything else exposes `window.seek(t)`), check layout with
+  `html_motion.still()`, render with `html_motion.render()` → PNG sequence with alpha → `vse.image_seq()`
+  on its own channel. Text/colours via `params` (`window.PARAMS`). Edit motion in the HTML and re-render;
+  timing/placement on the timeline stays editable in Blender. Example: `demos/d7_html_title.py` +
+  `demos/html/kinetic_title.html`. Blender stays the tool for 3D, footage, light and particles.
 - **Game footage** (Unity): `tools/unity/record_bot_gameplay.cs` → JPEG frames → `media.assemble_sequence()`.
 
 ## What actually works (measured on the author's machine, RTX 3080)
@@ -128,6 +135,7 @@ reload a file with unsaved user changes; ask).
 | librosa beats | Good beat grid; tempo may come out at half/double (83 vs 167 BPM) — harmless for cutting, but check before quoting BPM. |
 | NVENC | h264_nvenc 2× faster than x264 (larger files); hevc_nvenc fastest + small. No AV1 encode on RTX 30. |
 | Unity Recorder + BalanceBot | Real 1080×1920 60 fps footage. **Record a JPEG sequence (~28 fps capture), never the MP4 movie recorder** — Unity's Media Foundation MP4 encoder stalls ~1 s per frame after ~100–200 frames. Details: `references/unity_capture.md`. |
+| html_motion (Playwright 1.65, Chromium headless shell) | Pipeline works: deterministic seek, true alpha, OFL fonts load; 1080p ≈ 13 fps render (210 frames / 16 s). Only a basic title tested so far — artistic verdict pending a proper demo. Any time-based JS must go through `window.seek(t)`, or frames will drift. |
 | yt-dlp | Works with deno available (`env.tool_env()`); `--download-sections` for excerpts. |
 
 ## Blender 5.3 VSE pitfalls (cost real time before)

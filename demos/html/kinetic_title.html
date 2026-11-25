@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- Kinetic title overlay for vsekit.html_motion. Params: title, subtitle, accent. Transparent background. -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
+  .stage { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+           justify-content: center; gap: 18px; }
+  .title { font: 168px/1 'VSEKit Title', sans-serif; color: #fff; letter-spacing: 4px; white-space: pre;
+           text-shadow: 0 10px 0 rgba(0,0,0,.35), 0 0 40px rgba(0,0,0,.35); }
+  .title span { display: inline-block; opacity: 0; transform-origin: 50% 100%;
+                animation: drop .62s cubic-bezier(.2,.9,.25,1.35) both, out .35s ease-in both;
+                animation-delay: calc(var(--i) * 45ms), calc(2.9s + var(--i) * 18ms); }
+  @keyframes drop { 0% { opacity: 0; transform: translateY(-140px) rotate(-14deg) scaleY(1.25); }
+                    55% { opacity: 1; transform: translateY(10px) rotate(2deg) scaleY(.86); }
+                    100% { opacity: 1; transform: none; } }
+  @keyframes out { to { opacity: 0; transform: translateY(40px) scale(.9); } }
+  svg { width: 1100px; height: 90px; overflow: visible; }
+  .stroke { fill: none; stroke: var(--accent); stroke-width: 14; stroke-linecap: round;
+            stroke-dasharray: 1; stroke-dashoffset: 1;
+            animation: draw .9s cubic-bezier(.65,0,.35,1) .75s both, fade .3s ease-in 3.0s both; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes fade { to { opacity: 0; } }
+  .sub { font: 500 54px/1.2 'VSEKit Body', sans-serif; color: #fff; display: flex; gap: 18px; }
+  .sub span { display: inline-block; opacity: 0;
+              animation: rise .5s cubic-bezier(.2,.8,.2,1) both, fade .25s ease-in 3.05s both;
+              animation-delay: calc(1.35s + var(--i) * 90ms), 3.05s; }
+  .sub span.hl { color: var(--accent); }
+  @keyframes rise { from { opacity: 0; transform: translateY(36px); filter: blur(6px); }
+                    to { opacity: 1; transform: none; filter: none; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="title" id="title"></div>
+  <svg viewBox="0 0 1100 90"><path class="stroke" pathLength="1"
+       d="M20 60 C 220 20, 420 85, 560 50 S 900 15, 1080 45"/></svg>
+  <div class="sub" id="sub"></div>
+</div>
+<script>
+  const P = Object.assign({ title: 'VOXEL SURVIVOR', subtitle: 'devlog #1 · *new* enemies', accent: '#FFD60A' },
+                          window.PARAMS || {});
+  document.documentElement.style.setProperty('--accent', P.accent);
+  const t = document.getElementById('title');
+  [...P.title].forEach((ch, i) => { const s = document.createElement('span'); s.textContent = ch;
+                                     s.style.setProperty('--i', i); t.appendChild(s); });
+  const sub = document.getElementById('sub');
+  P.subtitle.split(' ').forEach((w, i) => { const s = document.createElement('span');
+    const hl = /^\*.*\*$/.test(w); s.textContent = hl ? w.slice(1, -1) : w; if (hl) s.className = 'hl';
+    s.style.setProperty('--i', i); sub.appendChild(s); });
+</script>
+</body>
+</html>

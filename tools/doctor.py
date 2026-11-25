@@ -42,7 +42,7 @@ check("Fonts", all(os.path.exists(p) for p in (E.FONT_TITLE, E.FONT_BODY)), E.FO
 # main venv
 probe = r"""
 import json, importlib
-mods = ['faster_whisper','librosa','scenedetect','cv2','kokoro','soundfile','opentimelineio','yt_dlp','PIL','edge_tts','en_core_web_sm']
+mods = ['faster_whisper','librosa','scenedetect','cv2','kokoro','soundfile','opentimelineio','yt_dlp','PIL','edge_tts','en_core_web_sm','playwright']
 res = {}
 for m in mods:
     try:
@@ -66,9 +66,16 @@ if os.path.exists(E.VENV_PY):
         if k == "cuda":
             check("torch CUDA", bool(v), "GPU whisper/kokoro (CPU works, slower)", required=False)
         else:
-            check(f".venv {k}", not str(v).startswith("ERR"), str(v), required=k not in ("kokoro", "torch"))
+            check(f".venv {k}", not str(v).startswith("ERR"), str(v), required=k not in ("kokoro", "torch", "playwright"))
 else:
     check(".venv", False, "run setup.ps1")
+
+# headless Chromium for html_motion
+if os.path.exists(E.VENV_PY):
+    code, out = run([E.VENV_PY, "-c", "from playwright.sync_api import sync_playwright as s; p=s().start(); "
+                     "b=p.chromium.launch(); print(b.version); b.close(); p.stop()"], timeout=60)
+    check("Chromium (html_motion)", code == 0, out.strip()[-80:] if code == 0 else "python -m playwright install chromium --only-shell",
+          required=False)
 
 # DeepFilterNet venv
 if os.path.exists(E.VENV_DF_PY):

@@ -45,7 +45,8 @@ Outside Blender (`.venv`): `env` (tool discovery), `audio` (music/SFX synth), `g
 `tts` (edge / kokoro / sapi + whisper align), `media` (ffmpeg: probe, loudness, finalize −14 LUFS, contact
 sheets, cut-boundary strips, export verification, image-sequence assembly), `transcribe` (whisper, SRT, jump-cut lists, chapters), `beats` (tempo,
 beats, downbeats, energy), `scenes` (shot detection), `denoise` (DeepFilterNet, ffmpeg voice chain,
-silencedetect), `upscale` (Real-ESRGAN), `download` (yt-dlp), `analyze` (`python -m vsekit.analyze
+silencedetect), `upscale` (Real-ESRGAN), `download` (yt-dlp), `html_motion` (HTML/CSS/SVG → PNG sequence
+with alpha via headless Chromium; template: `demos/html/kinetic_title.html`), `analyze` (`python -m vsekit.analyze
 <url|file>` → report.md).
 
 Inside Blender: `vse` (strips, trimmed clips, keys with easing, shake, meta, fades), `fx` (compositor
@@ -61,6 +62,7 @@ groups: grade, whip, glitch, iris, CA pulse), `three_d` (voxel models, stop-moti
 | deno | winget | yt-dlp's JS runtime for YouTube |
 | uv | winget | venv management |
 | yt-dlp, faster-whisper, librosa, PySceneDetect, Kokoro, OpenTimelineIO, Pillow, edge-tts | `requirements.txt` → `.venv` | `vsekit.*` |
+| Playwright + headless Chromium | `requirements.txt` + setup.ps1 (`playwright install chromium --only-shell`) | `vsekit.html_motion` |
 | torch / torchaudio | setup.ps1 (CUDA or CPU) | whisper, kokoro |
 | DeepFilterNet | `requirements-df.txt` → `.venv-df` | `vsekit.denoise` |
 | Real-ESRGAN ncnn-vulkan | setup.ps1 download | `vsekit.upscale` |

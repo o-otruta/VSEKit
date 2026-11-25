@@ -51,6 +51,8 @@ if (-not $SkipML) {
     & $uv pip install --python $py torch torchaudio --index-url $index; if ($LASTEXITCODE) { throw 'torch failed' }
 }
 & $uv pip install --python $py -r requirements.txt; if ($LASTEXITCODE) { throw 'requirements failed' }
+# headless Chromium for vsekit.html_motion (~250 MB, %LOCALAPPDATA%\ms-playwright; no-op when present)
+& $py -m playwright install chromium --only-shell; if ($LASTEXITCODE) { Write-Warning 'playwright chromium install failed (html_motion unavailable)' }
 
 Step "Blender"
 $blender = (& $py -m vsekit.env blender).Trim()
