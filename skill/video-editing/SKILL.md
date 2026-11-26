@@ -116,8 +116,14 @@ reload a file with unsaved user changes; ask).
   are seeked automatically; anything else exposes `window.seek(t)`), check layout with
   `html_motion.still()`, render with `html_motion.render()` → PNG sequence with alpha → `vse.image_seq()`
   on its own channel. Text/colours via `params` (`window.PARAMS`). Edit motion in the HTML and re-render;
-  timing/placement on the timeline stays editable in Blender. Example: `demos/d7_html_title.py` +
-  `demos/html/kinetic_title.html`. Blender stays the tool for 3D, footage, light and particles.
+  timing/placement on the timeline stays editable in Blender. Put all scenes of a piece on **one absolute
+  clock in one page** and render each scene window (`start=`, `duration=`) into its own strip — elements
+  can then carry across scenes (an underline that becomes a chart bar) while the timeline still has one
+  strip per scene. Numbers that count: `@property --n { syntax: '<integer>' }` + `counter()` (seekable, no
+  JS). Cursors: CSS `offset-path` with `offset-anchor: 0 0` (tip = hotspot). Darken busy footage under text
+  with a keyed colour strip in Blender, not inside the HTML. Examples: `demos/d7_html_title.py` (minimal),
+  `demos/d8_sprint_short.py` + `demos/html/sprint_short.html` (full 9:16 short with accent map and
+  shot notes in the docstring). Blender stays the tool for 3D, footage, light and particles.
 - **Game footage** (Unity): `tools/unity/record_bot_gameplay.cs` → JPEG frames → `media.assemble_sequence()`.
 
 ## What actually works (measured on the author's machine, RTX 3080)
@@ -135,7 +141,7 @@ reload a file with unsaved user changes; ask).
 | librosa beats | Good beat grid; tempo may come out at half/double (83 vs 167 BPM) — harmless for cutting, but check before quoting BPM. |
 | NVENC | h264_nvenc 2× faster than x264 (larger files); hevc_nvenc fastest + small. No AV1 encode on RTX 30. |
 | Unity Recorder + BalanceBot | Real 1080×1920 60 fps footage. **Record a JPEG sequence (~28 fps capture), never the MP4 movie recorder** — Unity's Media Foundation MP4 encoder stalls ~1 s per frame after ~100–200 frames. Details: `references/unity_capture.md`. |
-| html_motion (Playwright 1.65, Chromium headless shell) | Pipeline works: deterministic seek, true alpha, OFL fonts load; 1080p ≈ 13 fps render (210 frames / 16 s). Only a basic title tested so far — artistic verdict pending a proper demo. Any time-based JS must go through `window.seek(t)`, or frames will drift. |
+| html_motion (Playwright 1.65, Chromium headless shell) | Very good for typography, counters, charts, UI cards + cursor: the 11.7 s 9:16 short (`demos/d8`) took one HTML file, 702 frames in ~63 s (≈11 fps at 1080×1920), true alpha, fonts OK. Exits must finish *inside* a scene's render window or the strip cuts them mid-move (caught at review via `boundary_strip`). Time-based JS must go through `window.seek(t)`. |
 | yt-dlp | Works with deno available (`env.tool_env()`); `--download-sections` for excerpts. |
 
 ## Blender 5.3 VSE pitfalls (cost real time before)

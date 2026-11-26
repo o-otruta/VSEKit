@@ -1,0 +1,211 @@
+<!doctype html>
+<!-- 9:16 devlog overlay for vsekit.html_motion (transparent). Four scenes on one absolute timeline (seconds);
+     demos/d8_sprint_short.py renders each scene window into its own VSE strip.
+     PARAMS: icons {splitter, wisp, golemite} (file URIs), credit (string). Timings match the music accent map. -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @property --n { syntax: '<integer>'; inherits: false; initial-value: 50; }
+  :root { --acc: #FFD60A; --panel: rgba(13, 15, 28, .9); --mute: #9aa0b8; }
+  html, body { margin: 0; width: 1080px; height: 1920px; background: transparent; overflow: hidden;
+               font-family: 'VSEKit Body', sans-serif; color: #fff; }
+  .abs { position: absolute; }
+  .title { font-family: 'VSEKit Title', sans-serif; letter-spacing: 2px; white-space: pre;
+           text-shadow: 0 8px 0 rgba(0,0,0,.45), 0 0 36px rgba(0,0,0,.55); }
+  .center { left: 0; right: 0; text-align: center; }
+  /* a scene is visible only inside its window; everything inside animates on the same absolute clock */
+  .scene { position: absolute; inset: 0; opacity: 0; animation: show var(--d) linear var(--in) none; }
+  @keyframes show { from, to { opacity: 1; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ---------- S1 hook 0 – 2.6 ---------- */
+  .swarm img { position: absolute; image-rendering: pixelated; opacity: .5;
+               animation: fly var(--dur) linear var(--del) both; }
+  @keyframes fly { from { transform: translateY(2050px) rotate(var(--r0)); }
+                   to   { transform: translateY(-260px) rotate(var(--r1)); } }
+  /* exits must finish inside the scene window (ends 2.6 s), or the strip cuts them off mid-move */
+  .swarm { animation: fadeOut .22s linear 2.3s both; }
+  @keyframes fadeOut { to { opacity: 0; } }
+  #l1 { top: 610px; font-size: 156px; animation: exitUp .2s cubic-bezier(.5,0,.9,.4) 2.3s both; }
+  #l1 span { display: inline-block; animation: slam .34s cubic-bezier(.2,1.5,.45,1) calc(.02s + var(--i) * .026s) both; }
+  @keyframes slam { 0% { opacity: 0; transform: scale(2.7) translateY(-40px); }
+                    40% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+  #l2 { top: 790px; font-size: 128px; animation: exitUp .2s cubic-bezier(.5,0,.9,.4) 2.36s both; }
+  #l2 span { display: inline-block; margin: 0 14px;
+             animation: whipIn .34s cubic-bezier(.15,.95,.3,1.12) calc(1.47s + var(--i) * .08s) both; }
+  #l2 span.hl { color: var(--acc); }
+  @keyframes whipIn { from { opacity: 0; transform: translateX(560px) skewX(-28deg); filter: blur(8px); }
+                      to   { opacity: 1; transform: none; filter: none; } }
+  @keyframes exitUp { to { transform: translateY(-320px); opacity: 0; } }
+
+  /* shared bar: S1 underline -> S2 "before" bar */
+  #bar { position: absolute; left: 140px; top: 960px; width: 800px; height: 30px; border-radius: 15px;
+         background: var(--acc); transform-origin: 0 50%; box-shadow: 0 8px 24px rgba(0,0,0,.45);
+         color: #0d0f1c; font: 44px/96px 'VSEKit Title'; text-align: right; box-sizing: border-box;
+         padding-right: 28px; overflow: hidden;
+         animation: draw .42s cubic-bezier(.7,0,.25,1) 1.8s both,
+                    toBefore .38s cubic-bezier(.6,0,.2,1) 2.62s both,
+                    barOut .3s cubic-bezier(.6,0,.9,.5) 5.62s both; }
+  @keyframes draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes toBefore { to { top: 905px; height: 96px; border-radius: 22px; background: #5b6075; color: #fff; } }
+  @keyframes barOut { to { left: -1000px; } }
+  #bar span { opacity: 0; animation: fadeIn .2s linear 2.9s both; }
+
+  /* ---------- S2 stat 2.6 – 5.9 ---------- */
+  #s2 .wrap { position: absolute; inset: 0; animation: slideOut .3s cubic-bezier(.6,0,.9,.5) 5.62s both; }
+  @keyframes slideOut { to { transform: translateX(-1100px); } }
+  .label { font: 500 40px 'VSEKit Body'; color: var(--mute); letter-spacing: 6px; }
+  #s2 .head { top: 700px; font-size: 92px; animation: dropIn .4s cubic-bezier(.2,1.3,.4,1) 2.72s both; }
+  @keyframes dropIn { from { opacity: 0; transform: translateY(-80px); } to { opacity: 1; transform: none; } }
+  #lbBefore { left: 144px; top: 845px; animation: fadeIn .25s linear 2.85s both; }
+  #lbNow { left: 144px; top: 1035px; animation: fadeIn .25s linear 3.0s both; }
+  #barNow { left: 140px; top: 1095px; width: 800px; height: 96px; border-radius: 22px; background: var(--acc);
+            box-shadow: 0 8px 24px rgba(0,0,0,.45); color: #0d0f1c; font: 44px/96px 'VSEKit Title';
+            text-align: right; padding-right: 28px; box-sizing: border-box; transform-origin: 0 50%;
+            animation: growIn .35s cubic-bezier(.3,1.3,.5,1) 3.0s both, shrink 1.44s cubic-bezier(.75,0,.25,1) 3.3s both; }
+  @keyframes growIn { from { transform: scaleX(0); } to { transform: none; } }
+  @keyframes shrink { to { width: 256px; } }
+  #barNow .val { --n: 50; counter-reset: n var(--n); animation: count 1.44s cubic-bezier(.75,0,.25,1) 3.3s both; }
+  #barNow .val::after { content: "0." counter(n, decimal-leading-zero) "s"; }
+  @keyframes count { from { --n: 50; } to { --n: 16; } }
+  #fast { top: 1270px; font-size: 104px; animation: pop .42s cubic-bezier(.2,1.6,.4,1) 4.7s both; }
+  #fast b { color: var(--acc); font-weight: normal; }
+  @keyframes pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+  #fastSub { top: 1400px; font: 500 44px 'VSEKit Body'; color: #dfe2ee; animation: fadeIn .3s linear 4.95s both; }
+
+  /* ---------- S3 new enemies 5.9 – 9.12 ---------- */
+  #s3 .wrap { position: absolute; inset: 0; transform-origin: 50% 55%;
+              animation: s3out .24s cubic-bezier(.6,0,.9,.5) 8.86s both; }
+  @keyframes s3out { to { transform: scale(.9); opacity: 0; } }
+  #s3 .head { top: 470px; font-size: 96px; animation: dropIn .4s cubic-bezier(.2,1.3,.4,1) 5.92s both; }
+  .card { position: absolute; left: 80px; width: 920px;
+          animation: cardIn .46s cubic-bezier(.2,1.25,.4,1) var(--del) both, dim .3s ease 7.66s both; }
+  .card.pick { animation: cardIn .46s cubic-bezier(.2,1.25,.4,1) var(--del) both; }
+  @keyframes cardIn { from { opacity: 0; transform: translateX(1100px) rotate(6deg); } to { opacity: 1; transform: none; } }
+  @keyframes dim { to { opacity: .4; } }
+  .inner { position: relative; height: 210px; border-radius: 30px; background: var(--panel);
+           border: 3px solid rgba(255,255,255,.12); box-shadow: 0 14px 40px rgba(0,0,0,.5); overflow: hidden; }
+  .pick .inner { animation: hover .2s ease-out 7.4s both, press .1s ease-in 7.58s both,
+                 expand .42s cubic-bezier(.2,1.1,.4,1) 7.68s both; }
+  @keyframes hover { to { transform: scale(1.03); border-color: var(--acc); } }
+  @keyframes press { to { transform: scale(.99); } }
+  @keyframes expand { to { height: 400px; transform: scale(1.02); } }
+  .icon { position: absolute; left: 26px; top: 26px; width: 158px; height: 158px; border-radius: 22px;
+          background: rgba(255,255,255,.06); image-rendering: pixelated; }
+  .name { position: absolute; left: 216px; top: 34px; font: 58px 'VSEKit Title'; }
+  .wave { position: absolute; right: 30px; top: 40px; font: 34px 'VSEKit Title'; color: #0d0f1c;
+          background: var(--acc); border-radius: 14px; padding: 6px 16px; }
+  .desc { position: absolute; left: 218px; top: 118px; font: 500 40px 'VSEKit Body'; color: #c9cde0; }
+  .phases { position: absolute; left: 26px; right: 26px; top: 224px; display: flex; align-items: center; gap: 22px;
+            opacity: 0; animation: phIn .35s cubic-bezier(.2,1.2,.4,1) 7.86s both; }
+  @keyframes phIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+  .ph { flex: 1; border-radius: 22px; padding: 18px 22px; background: rgba(255,255,255,.07); }
+  .ph small { display: block; font: 500 30px 'VSEKit Body'; color: var(--mute); letter-spacing: 4px; }
+  .ph span { font: 46px 'VSEKit Title'; }
+  .ph.core span { color: var(--acc); }
+  .arrow { font: 64px 'VSEKit Title'; color: var(--acc); }
+  /* cursor: path -> press -> drift away; hotspot = arrow tip at the element origin */
+  #cur { position: absolute; left: 0; top: 0; offset-path: path('M 1180 1980 C 1050 1700, 900 1420, 812 1262');
+         offset-rotate: 0deg; offset-anchor: 0 0; offset-distance: 0%;
+         animation: curMove .62s cubic-bezier(.45,0,.2,1) 6.8s both; }
+  @keyframes curMove { to { offset-distance: 100%; } }
+  #cur .press { transform-origin: 0 0; animation: curPress .08s ease-in 7.58s both, curRelease .14s ease-out 7.68s both; }
+  @keyframes curPress { to { transform: scale(.84); } }
+  @keyframes curRelease { from { transform: scale(.84); } to { transform: none; } }
+  #cur .away { animation: curAway .5s cubic-bezier(.5,0,.8,.6) 8.05s both; }
+  @keyframes curAway { to { transform: translate(260px, 520px); } }
+
+  /* ---------- S4 end card 9.12 – 11.7 ---------- */
+  .mask { overflow: hidden; padding: 0 10px 18px; }
+  .mask span { display: inline-block; animation: rise .38s cubic-bezier(.2,1.3,.4,1) calc(8.95s + var(--i) * .028s) both; }
+  @keyframes rise { from { transform: translateY(115%); } to { transform: none; } }
+  #e1 { top: 700px; font-size: 168px; }
+  #e2 { top: 880px; font-size: 140px; color: var(--acc); }
+  #e2 span { animation-delay: calc(9.08s + var(--i) * .028s); }
+  #pill { top: 1100px; }
+  #pill b { display: inline-block; font: 48px 'VSEKit Title'; font-weight: normal; color: #0d0f1c; background: #fff;
+            border-radius: 18px; padding: 10px 28px; animation: pop .4s cubic-bezier(.2,1.6,.4,1) 9.5s both; }
+  #credit { top: 1440px; font: 500 30px/1.45 'VSEKit Body'; color: rgba(255,255,255,.82);
+            animation: fadeIn .4s linear 9.7s both; text-shadow: 0 2px 8px rgba(0,0,0,.8); }
+</style>
+</head>
+<body>
+<div class="scene" id="s1" style="--in:0s;--d:2.6s">
+  <div class="swarm" id="swarm"></div>
+  <div class="abs title center" id="l1"></div>
+  <div class="abs title center" id="l2"></div>
+</div>
+<div id="bar"><span>0.50s</span></div>
+
+<div class="scene" id="s2" style="--in:2.6s;--d:3.3s"><div class="wrap">
+  <div class="abs title center head">SPAWN DELAY</div>
+  <div class="abs label" id="lbBefore">BEFORE</div>
+  <div class="abs label" id="lbNow">SPRINT 16</div>
+  <div class="abs" id="barNow"><span class="val"></span></div>
+  <div class="abs title center" id="fast"><b>3×</b> FASTER</div>
+  <div class="abs center" id="fastSub">bigger packs · overlapping waves</div>
+</div></div>
+
+<div class="scene" id="s3" style="--in:5.9s;--d:3.22s"><div class="wrap">
+  <div class="abs title center head">NEW ENEMIES</div>
+  <div id="cards"></div>
+  <div id="cur"><div class="press"><div class="away">
+    <svg width="78" height="96" viewBox="0 0 26 32"><path d="M1 1 L1 25 L7.5 19.5 L11.5 29 L15.5 27.3 L11.6 18 L20 18 Z"
+         fill="#fff" stroke="#0d0f1c" stroke-width="2" stroke-linejoin="round"/></svg>
+  </div></div></div>
+</div></div>
+
+<div class="scene" id="s4" style="--in:9.12s;--d:2.6s">
+  <div class="abs title center mask" id="e1"></div>
+  <div class="abs title center mask" id="e2"></div>
+  <div class="abs center" id="pill"><b>DEVLOG · SPRINT 16</b></div>
+  <div class="abs center" id="credit"></div>
+</div>
+
+<script>
+  const P = Object.assign({ icons: {}, credit: '' }, window.PARAMS || {});
+  const letters = (id, text) => { const el = document.getElementById(id);
+    [...text].forEach((ch, i) => { const s = document.createElement('span'); s.textContent = ch;
+      s.style.setProperty('--i', i); el.appendChild(s); }); };
+  letters('l1', 'THE HORDE');
+  letters('e1', 'VOXEL');
+  letters('e2', 'SURVIVOR');
+  const l2 = document.getElementById('l2');
+  ['GOT', 'DENSER'].forEach((w, i) => { const s = document.createElement('span'); s.textContent = w;
+    if (i === 1) s.className = 'hl'; s.style.setProperty('--i', i); l2.appendChild(s); });
+
+  // deterministic swarm (seeded PRNG): density grows over the scene -> "the horde got denser"
+  let seed = 7; const rnd = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
+  const pool = [P.icons.splitter, P.icons.wisp, P.icons.golemite].filter(Boolean);
+  const sw = document.getElementById('swarm');
+  for (let i = 0; i < 46 && pool.length; i++) {
+    const im = document.createElement('img'); im.src = pool[i % pool.length];
+    const size = 44 + rnd() * 70; im.width = im.height = size;
+    im.style.left = (rnd() * 1080 - size / 2) + 'px';
+    im.style.setProperty('--dur', (1.5 + rnd() * 1.1) + 's');
+    im.style.setProperty('--del', (2.4 * Math.sqrt(rnd()) - 1.2) + 's');
+    im.style.setProperty('--r0', (rnd() * 40 - 20) + 'deg'); im.style.setProperty('--r1', (rnd() * 60 - 30) + 'deg');
+    sw.appendChild(im);
+  }
+
+  const cards = [
+    { k: 'splitter', name: 'SPLITTER SLIME', wave: 'W32', desc: 'splits on death', del: 5.98 },
+    { k: 'wisp', name: 'FROST WISP', wave: 'W46', desc: 'flies, leaves frost', del: 6.14 },
+    { k: 'golemite', name: 'SIEGE GOLEMITE', wave: 'W61', desc: 'two-phase tank', del: 6.30, pick: true },
+  ];
+  const host = document.getElementById('cards');
+  cards.forEach((c, i) => {
+    const d = document.createElement('div'); d.className = 'card' + (c.pick ? ' pick' : '');
+    d.style.top = (640 + i * 236) + 'px'; d.style.setProperty('--del', c.del + 's');
+    d.innerHTML = `<div class="inner"><img class="icon" src="${P.icons[c.k] || ''}"><div class="name">${c.name}</div>
+      <div class="wave">${c.wave}</div><div class="desc">${c.desc}</div>` +
+      (c.pick ? `<div class="phases"><div class="ph"><small>PHASE 1</small><span>STONE SHELL</span></div>
+       <div class="arrow">→</div><div class="ph core"><small>PHASE 2</small><span>FAST CORE</span></div></div>` : '') +
+      `</div>`;
+    host.appendChild(d);
+  });
+  document.getElementById('credit').innerHTML = P.credit;
+</script>
+</body>
+</html>
